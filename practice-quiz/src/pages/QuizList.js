@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Typography, Space, Button, Pagination, Empty } from 'antd';
-import { ClockCircleOutlined, UserOutlined, BookOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Typography, Space, Button, Pagination, Empty, Input } from 'antd';
+import { ClockCircleOutlined, UserOutlined, BookOutlined, SearchOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getODataURL } from '../config/api.config';
@@ -8,6 +8,7 @@ import MainLayout from '../components/Layout/MainLayout';
 import './QuizList.css';
 
 const { Title, Text } = Typography;
+const { Search } = Input;
 
 const QuizList = () => {
     const { subjectId } = useParams();
@@ -18,6 +19,7 @@ const QuizList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(8);
     const [error, setError] = useState(null);
+    const [searchText, setSearchText] = useState('');
 
     const handleStartQuiz = (quiz) => {
         const userId = localStorage.getItem('userId');
@@ -36,6 +38,12 @@ const QuizList = () => {
             const skip = (currentPage - 1) * pageSize;
             let url = `${getODataURL('/Quiz')}?$count=true&$skip=${skip}&$top=${pageSize}`;
             url += `&$filter=SubjectId eq ${subjectId}`;
+            
+            // Add search filter if search text exists
+            if (searchText) {
+                url += ` and contains(Title, '${searchText}')`;
+            }
+
             url += '&$orderby=CreatedAt desc';
 
             const response = await fetch(url);
@@ -67,7 +75,12 @@ const QuizList = () => {
         if (subjectId) {
             fetchQuizzes();
         }
-    }, [currentPage, pageSize, subjectId]);
+    }, [currentPage, pageSize, subjectId, searchText]);
+
+    const handleSearch = (value) => {
+        setSearchText(value);
+        setCurrentPage(1);
+    };
 
     if (error) {
         return (
@@ -102,6 +115,13 @@ const QuizList = () => {
                     {currentSubject && (
                         <Text className="subtitle">{currentSubject.Description}</Text>
                     )}
+                    <Search
+                        placeholder="Search by Quiz Title"
+                        allowClear
+                        onSearch={handleSearch}
+                        style={{ width: 300 }}
+                        prefix={<SearchOutlined />}
+                    />
                 </div>
 
                 {loading ? (
