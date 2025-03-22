@@ -19,6 +19,16 @@ const QuizList = () => {
     const [pageSize, setPageSize] = useState(8);
     const [error, setError] = useState(null);
 
+    const handleStartQuiz = (quiz) => {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            toast.warning('Please login to start the quiz');
+            navigate('/login', { state: { from: `/quiz/${quiz.QuizId}` } });
+            return;
+        }
+        navigate(`/quiz/${quiz.QuizId}`, { state: { quiz } });
+    };
+
     const fetchQuizzes = async () => {
         try {
             setLoading(true);
@@ -117,7 +127,11 @@ const QuizList = () => {
                                     hoverable
                                     className="quiz-card"
                                     actions={[
-                                        <Button type="primary" className="start-quiz-button">
+                                        <Button 
+                                            type="primary" 
+                                            className="start-quiz-button"
+                                            onClick={() => handleStartQuiz(quiz)}
+                                        >
                                             Start Quiz
                                         </Button>
                                     ]}

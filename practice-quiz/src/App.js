@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import QuizList from './pages/QuizList';
+import QuizAttempt from './pages/QuizAttempt';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/subject/:subjectId/quizzes" element={<QuizList />} />
+        <Route path="/quiz/:quizId" element={<QuizAttempt />} />
         <Route path="/" element={<Navigate to="/home" replace />} />
       </Routes>
     </Router>
