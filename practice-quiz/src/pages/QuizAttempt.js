@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, Card, Radio, Button, Progress, Typography, Space, Modal } from 'antd';
+import { Layout, Menu, Card, Radio, Button, Progress, Typography, Space, Modal, Tooltip } from 'antd';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { StarOutlined, StarFilled, LeftOutlined, RightOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { getODataURL } from '../config/api.config';
 import './QuizAttempt.css';
 
@@ -16,6 +17,7 @@ const QuizAttempt = () => {
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState({});
+    const [starredQuestions, setStarredQuestions] = useState({});
     const [timeLeft, setTimeLeft] = useState(0);
     const [loading, setLoading] = useState(true);
 
@@ -107,6 +109,13 @@ const QuizAttempt = () => {
         });
     };
 
+    const handleStarQuestion = (questionId) => {
+        setStarredQuestions(prev => ({
+            ...prev,
+            [questionId]: !prev[questionId]
+        }));
+    };
+
     if (loading) {
         return <div className="quiz-loading">Loading quiz...</div>;
     }
@@ -131,7 +140,11 @@ const QuizAttempt = () => {
 
     return (
         <Layout className="quiz-attempt-layout">
-            <Sider width={200} className="question-navigation">
+            <Sider width={280} className="question-navigation">
+                <div className="quiz-info-section">
+                    <Title level={4}>{quizData.Title}</Title>
+                    <Text type="secondary">{quizData.Description}</Text>
+                </div>
                 <div className="timer-section">
                     <Title level={5}>Time Remaining</Title>
                     <Text className="timer">{formatTime(timeLeft)}</Text>
@@ -139,6 +152,19 @@ const QuizAttempt = () => {
                         percent={(timeLeft / (quizData.TimeLimit * 60)) * 100} 
                         showInfo={false}
                         status={timeLeft < 60 ? "exception" : "active"}
+                        strokeColor={{
+                            '0%': '#108ee9',
+                            '100%': '#87d068',
+                        }}
+                    />
+                </div>
+                <div className="questions-progress">
+                    <Text>Progress: {Object.keys(answers).length} / {questions.length} answered</Text>
+                    <Progress 
+                        percent={(Object.keys(answers).length / questions.length) * 100}
+                        size="small"
+                        showInfo={false}
+                        strokeColor="#52c41a"
                     />
                 </div>
                 <Menu
@@ -150,9 +176,24 @@ const QuizAttempt = () => {
                         <Menu.Item
                             key={index}
                             onClick={() => setCurrentQuestionIndex(index)}
-                            className={answers[question.QuestionId] ? 'answered' : ''}
+                            className={`question-item ${answers[question.QuestionId] ? 'answered' : ''} ${starredQuestions[question.QuestionId] ? 'starred' : ''}`}
                         >
-                            Question {index + 1}
+                            <div className="question-item-content">
+                                <span className="question-number">Question {index + 1}</span>
+                                {answers[question.QuestionId] && (
+                                    <CheckCircleOutlined className="answered-icon" />
+                                )}
+                                <Button
+                                    type="text"
+                                    size="small"
+                                    className="star-button"
+                                    icon={starredQuestions[question.QuestionId] ? <StarFilled /> : <StarOutlined />}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleStarQuestion(question.QuestionId);
+                                    }}
+                                />
+                            </div>
                         </Menu.Item>
                     ))}
                 </Menu>
@@ -160,8 +201,22 @@ const QuizAttempt = () => {
             <Content className="quiz-content">
                 <Card className="question-card">
                     <div className="question-header">
-                        <Title level={4}>Question {currentQuestionIndex + 1}</Title>
-                        <Text>{currentQuestion.Content}</Text>
+                        <div className="question-title">
+                            <Title level={4}>Question {currentQuestionIndex + 1}</Title>
+                            <Button
+                                type="text"
+                                icon={starredQuestions[currentQuestion.QuestionId] ? <StarFilled /> : <StarOutlined />}
+                                onClick={() => handleStarQuestion(currentQuestion.QuestionId)}
+                                className={`star-question-button ${starredQuestions[currentQuestion.QuestionId] ? 'starred' : ''}`}
+                            >
+                                {starredQuestions[currentQuestion.QuestionId] ? 'Marked' : 'Mark for review'}
+                            </Button>
+                        </div>
+                        <Text className="question-content">{currentQuestion.Content}</Text>
+                        <div className="question-meta">
+                            <Text type="secondary">Type: {currentQuestion.QuestionType}</Text>
+                            <Text type="secondary">Difficulty: {currentQuestion.Level}</Text>
+                        </div>
                     </div>
                     <Radio.Group
                         className="options-group"
@@ -178,19 +233,21 @@ const QuizAttempt = () => {
                     </Radio.Group>
                     <div className="navigation-buttons">
                         <Button
+                            icon={<LeftOutlined />}
                             disabled={currentQuestionIndex === 0}
                             onClick={() => setCurrentQuestionIndex(prev => prev - 1)}
                         >
                             Previous
                         </Button>
+                        <Button type="primary" danger onClick={handleSubmit}>
+                            Submit Quiz
+                        </Button>
                         <Button
+                            icon={<RightOutlined />}
                             disabled={currentQuestionIndex === questions.length - 1}
                             onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
                         >
                             Next
-                        </Button>
-                        <Button type="primary" onClick={handleSubmit}>
-                            Submit Quiz
                         </Button>
                     </div>
                 </Card>
