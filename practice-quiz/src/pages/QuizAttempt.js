@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Layout, Menu, Card, Radio, Button, Progress, Typography, Space, Modal, Tooltip } from 'antd';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -20,6 +20,26 @@ const QuizAttempt = () => {
     const [starredQuestions, setStarredQuestions] = useState({});
     const [timeLeft, setTimeLeft] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [startTime, setStartTime] = useState(null);
+
+    // Memoize the initial time limit
+    const timeLimit = useMemo(() => quizData?.TimeLimit * 60 || 0, [quizData]);
+
+    // Memoize current question
+    const currentQuestion = useMemo(() => questions[currentQuestionIndex], [questions, currentQuestionIndex]);
+
+    // Memoize progress calculation
+    const progress = useMemo(() => ({
+        answered: Object.keys(answers).length,
+        total: questions.length,
+        percent: (Object.keys(answers).length / questions.length) * 100
+    }), [answers, questions.length]);
+
+    const formatTime = useCallback((seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }, []);
 
     useEffect(() => {
         const fetchQuestions = async () => {
@@ -37,7 +57,8 @@ const QuizAttempt = () => {
                     return;
                 }
 
-                setTimeLeft(quizData.TimeLimit * 60); // Convert minutes to seconds
+                setTimeLeft(timeLimit);
+                setStartTime(Date.now());
 
                 const questionsResponse = await fetch(
                     `${getODataURL('/Question')}?$filter=QuizId eq ${quizId}`, {
@@ -70,34 +91,36 @@ const QuizAttempt = () => {
         };
 
         fetchQuestions();
-    }, [quizId, navigate, quizData]);
+    }, [quizId, navigate, quizData, timeLimit]);
 
-    // Timer effect
+    // Optimized timer effect
     useEffect(() => {
-        if (timeLeft <= 0 || loading) return;
+        if (timeLeft <= 0 || loading || !startTime) return;
 
         const timer = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev <= 1) {
-                    clearInterval(timer);
-                    handleSubmit();
-                    return 0;
-                }
-                return prev - 1;
-            });
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const remaining = Math.max(0, timeLimit - elapsed);
+            
+            if (remaining <= 0) {
+                clearInterval(timer);
+                handleSubmit();
+                return;
+            }
+            
+            setTimeLeft(remaining);
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [timeLeft, loading]);
+    }, [timeLeft, loading, startTime, timeLimit]);
 
-    const handleAnswerChange = (questionId, value) => {
+    const handleAnswerChange = useCallback((questionId, value) => {
         setAnswers(prev => ({
             ...prev,
             [questionId]: value
         }));
-    };
+    }, []);
 
-    const handleSubmit = () => {
+    const handleSubmit = useCallback(() => {
         Modal.confirm({
             title: 'Submit Quiz',
             content: 'Are you sure you want to submit your answers?',
@@ -107,25 +130,18 @@ const QuizAttempt = () => {
                 navigate('/home');
             }
         });
-    };
+    }, [navigate]);
 
-    const handleStarQuestion = (questionId) => {
+    const handleStarQuestion = useCallback((questionId) => {
         setStarredQuestions(prev => ({
             ...prev,
             [questionId]: !prev[questionId]
         }));
-    };
+    }, []);
 
     if (loading) {
         return <div className="quiz-loading">Loading quiz...</div>;
     }
-
-    const currentQuestion = questions[currentQuestionIndex];
-    const formatTime = (seconds) => {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-    };
 
     if (!currentQuestion) {
         return (
@@ -149,7 +165,7 @@ const QuizAttempt = () => {
                     <Title level={5}>Time Remaining</Title>
                     <Text className="timer">{formatTime(timeLeft)}</Text>
                     <Progress 
-                        percent={(timeLeft / (quizData.TimeLimit * 60)) * 100} 
+                        percent={(timeLeft / timeLimit) * 100} 
                         showInfo={false}
                         status={timeLeft < 60 ? "exception" : "active"}
                         strokeColor={{
@@ -159,9 +175,9 @@ const QuizAttempt = () => {
                     />
                 </div>
                 <div className="questions-progress">
-                    <Text>Progress: {Object.keys(answers).length} / {questions.length} answered</Text>
+                    <Text>Progress: {progress.answered} / {progress.total} answered</Text>
                     <Progress 
-                        percent={(Object.keys(answers).length / questions.length) * 100}
+                        percent={progress.percent}
                         size="small"
                         showInfo={false}
                         strokeColor="#52c41a"
