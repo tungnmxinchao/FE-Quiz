@@ -177,6 +177,16 @@
     font-size: 14px;
 }
 
+.user-name {
+    color: white;
+    font-size: 16px;
+    margin-right: 16px;
+    font-weight: 500;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
     .header {

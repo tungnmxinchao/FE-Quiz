@@ -95,6 +95,8 @@
     border-radius: 12px !important;
     background: rgba(255, 255, 255, 0.9) !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex !important;
+    align-items: center !important;
 }
 
 .search-input .ant-input-affix-wrapper:hover,
@@ -106,17 +108,34 @@
 
 .search-input .ant-input-affix-wrapper input {
     height: 100%;
-    line-height: 42px;
     padding: 0 8px;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    font-size: 16px;
 }
 
 .search-input .ant-input-affix-wrapper .ant-input-prefix,
 .search-input .ant-input-affix-wrapper .ant-input-suffix {
     font-size: 16px;
-    line-height: 42px;
+    display: flex !important;
+    align-items: center !important;
+    background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.search-input .ant-input-affix-wrapper .anticon {
+    font-size: 22px;
+    margin-right: 8px;
+    transition: all 0.3s ease;
+}
+
+.search-input .ant-input-affix-wrapper:hover .anticon {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, #2563eb 0%, #1a365d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .sort-select {
