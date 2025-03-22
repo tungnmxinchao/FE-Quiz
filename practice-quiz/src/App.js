@@ -1,17 +1,15 @@
 import React from 'react';
-import { Button, Space } from 'antd';
-import './App.css';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Home from './pages/Home';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <Space direction="vertical" size="large">
-          <h1>Welcome to React with Ant Design</h1>
-          <Button type="primary">Click me!</Button>
-        </Space>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Navigate to="/home" replace />} />
+      </Routes>
+    </Router>
   );
 }
 
