@@ -1,0 +1,232 @@
+.home-container {
+    padding: 24px;
+}
+
+.home-header {
+    text-align: center;
+    margin-bottom: 50px;
+    position: relative;
+}
+
+.home-header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(90deg, #60a5fa, #2563eb);
+    border-radius: 2px;
+}
+
+.home-header h2 {
+    margin-bottom: 16px;
+    font-size: 36px;
+    background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.subtitle {
+    font-size: 18px;
+    color: #64748b;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.search-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.search-section::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.1), transparent);
+    z-index: -1;
+}
+
+.search-input {
+    width: 300px !important;
+}
+
+.search-input input {
+    border-radius: 12px;
+    height: 42px;
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    transition: all 0.3s ease;
+}
+
+.search-input input:hover,
+.search-input input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.sort-select {
+    width: 200px !important;
+}
+
+.sort-select .ant-select-selector {
+    border-radius: 12px !important;
+    height: 42px !important;
+    padding: 5px 16px !important;
+    border: 1px solid rgba(37, 99, 235, 0.2) !important;
+}
+
+.sort-select:hover .ant-select-selector {
+    border-color: #2563eb !important;
+}
+
+.subject-card {
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    height: 100%;
+    border: 1px solid rgba(37, 99, 235, 0.1);
+    overflow: hidden;
+    background: white;
+}
+
+.subject-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.1);
+    border-color: rgba(37, 99, 235, 0.2);
+}
+
+.card-icon {
+    font-size: 40px;
+    color: #2563eb;
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.card-icon::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, #60a5fa, #2563eb);
+    border-radius: 1px;
+}
+
+.card-title {
+    margin-bottom: 16px !important;
+    text-align: center;
+    color: #1a365d;
+    font-weight: 600;
+}
+
+.card-description {
+    display: block;
+    color: #64748b;
+    margin-bottom: 20px;
+    min-height: 40px;
+    line-height: 1.6;
+}
+
+.card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(37, 99, 235, 0.1);
+}
+
+.card-meta .ant-space {
+    color: #64748b;
+}
+
+.card-meta .anticon {
+    color: #2563eb;
+    font-size: 16px;
+}
+
+.practice-button {
+    width: 100%;
+    border-radius: 12px;
+    height: 42px;
+    background: linear-gradient(135deg, #2563eb 0%, #1a365d 100%);
+    border: none;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.practice-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+}
+
+.pagination-section {
+    margin-top: 50px;
+    text-align: center;
+    border-top: 1px solid rgba(37, 99, 235, 0.1);
+    padding-top: 30px;
+}
+
+.pagination-section .ant-pagination-item {
+    border-radius: 8px;
+    border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.pagination-section .ant-pagination-item-active {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.pagination-section .ant-pagination-item-active a {
+    color: white;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .home-container {
+        padding: 16px;
+    }
+
+    .home-header h2 {
+        font-size: 28px;
+    }
+
+    .subtitle {
+        font-size: 16px;
+    }
+
+    .search-section {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+
+    .search-input,
+    .sort-select {
+        width: 100% !important;
+    }
+
+    .card-icon {
+        font-size: 32px;
+        margin-bottom: 16px;
+    }
+
+    .card-title {
+        font-size: 18px !important;
+    }
+} 

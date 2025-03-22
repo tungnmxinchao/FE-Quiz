@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Input, Select, Pagination, Typography, Space } from 'antd';
+import { Card, Row, Col, Input, Select, Pagination, Typography, Space, Button } from 'antd';
+import { BookOutlined, UserOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { getODataURL } from '../config/api.config';
+import MainLayout from '../components/Layout/MainLayout';
+import './Home.css';
 
 const { Title, Text } = Typography;
 const { Search } = Input;
@@ -54,65 +57,83 @@ const Home = () => {
     };
 
     return (
-        <div style={{ padding: '24px' }}>
-            <Title level={2}>Practice Quizzes</Title>
-            <Space style={{ marginBottom: 24 }} size="large">
-                <Search
-                    placeholder="Search by subject name"
-                    allowClear
-                    onSearch={handleSearch}
-                    style={{ width: 300 }}
-                />
-                <Select
-                    defaultValue="desc"
-                    style={{ width: 200 }}
-                    onChange={handleSortChange}
-                    options={[
-                        { value: 'desc', label: 'Newest First' },
-                        { value: 'asc', label: 'Oldest First' },
-                    ]}
-                />
-            </Space>
+        <MainLayout>
+            <div className="home-container">
+                <div className="home-header">
+                    <Title level={2}>Explore Subjects</Title>
+                    <Text className="subtitle">Discover and practice various subjects to enhance your knowledge</Text>
+                </div>
 
-            <Row gutter={[16, 16]}>
-                {subjects.map((subject) => (
-                    <Col xs={24} sm={12} md={8} lg={6} key={subject.SubjectId}>
-                        <Card
-                            hoverable
-                            loading={loading}
-                            style={{ height: '100%' }}
-                        >
-                            <Title level={4}>{subject.SubjectName}</Title>
-                            <Text type="secondary">{subject.Description}</Text>
-                            <div style={{ marginTop: 12 }}>
-                                <Text type="secondary">
-                                    Created by: {subject.CreatedByUser.FullName}
-                                </Text>
-                            </div>
-                            <div>
-                                <Text type="secondary">
-                                    Created at: {new Date(subject.CreatedAt).toLocaleDateString()}
-                                </Text>
-                            </div>
-                        </Card>
-                    </Col>
-                ))}
-            </Row>
+                <div className="search-section">
+                    <Space size="large">
+                        <Search
+                            placeholder="Search by subject name"
+                            allowClear
+                            onSearch={handleSearch}
+                            style={{ width: 300 }}
+                            className="search-input"
+                        />
+                        <Select
+                            defaultValue="desc"
+                            style={{ width: 200 }}
+                            onChange={handleSortChange}
+                            options={[
+                                { value: 'desc', label: 'Newest First' },
+                                { value: 'asc', label: 'Oldest First' },
+                            ]}
+                            className="sort-select"
+                        />
+                    </Space>
+                </div>
 
-            <div style={{ marginTop: 24, textAlign: 'right' }}>
-                <Pagination
-                    current={currentPage}
-                    pageSize={pageSize}
-                    total={total}
-                    onChange={(page, size) => {
-                        setCurrentPage(page);
-                        setPageSize(size);
-                    }}
-                    showSizeChanger
-                    showTotal={(total) => `Total ${total} items`}
-                />
+                <Row gutter={[24, 24]}>
+                    {subjects.map((subject) => (
+                        <Col xs={24} sm={12} md={8} lg={6} key={subject.SubjectId}>
+                            <Card
+                                hoverable
+                                loading={loading}
+                                className="subject-card"
+                                actions={[
+                                    <Button type="primary" className="practice-button">
+                                        Start Practice
+                                    </Button>
+                                ]}
+                            >
+                                <div className="card-icon">
+                                    <BookOutlined />
+                                </div>
+                                <Title level={4} className="card-title">{subject.SubjectName}</Title>
+                                <Text className="card-description">{subject.Description}</Text>
+                                <div className="card-meta">
+                                    <Space>
+                                        <UserOutlined />
+                                        <Text>{subject.CreatedByUser.FullName}</Text>
+                                    </Space>
+                                    <Space>
+                                        <ClockCircleOutlined />
+                                        <Text>{new Date(subject.CreatedAt).toLocaleDateString()}</Text>
+                                    </Space>
+                                </div>
+                            </Card>
+                        </Col>
+                    ))}
+                </Row>
+
+                <div className="pagination-section">
+                    <Pagination
+                        current={currentPage}
+                        pageSize={pageSize}
+                        total={total}
+                        onChange={(page, size) => {
+                            setCurrentPage(page);
+                            setPageSize(size);
+                        }}
+                        showSizeChanger
+                        showTotal={(total) => `Total ${total} items`}
+                    />
+                </div>
             </div>
-        </div>
+        </MainLayout>
     );
 };
 
