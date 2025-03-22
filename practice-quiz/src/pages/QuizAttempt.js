@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Layout, Menu, Card, Radio, Button, Progress, Typography, Space, Modal, Tooltip } from 'antd';
+import { Layout, Menu, Card, Radio, Button, Progress, Typography, Space, Modal, Tooltip, message } from 'antd';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { StarOutlined, StarFilled, LeftOutlined, RightOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { StarOutlined, StarFilled, LeftOutlined, RightOutlined, CheckCircleOutlined, ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { getODataURL } from '../config/api.config';
 import './QuizAttempt.css';
 
@@ -21,6 +21,8 @@ const QuizAttempt = () => {
     const [timeLeft, setTimeLeft] = useState(0);
     const [loading, setLoading] = useState(true);
     const [startTime, setStartTime] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showSubmitModal, setShowSubmitModal] = useState(false);
 
     // Memoize the initial time limit
     const timeLimit = useMemo(() => quizData?.TimeLimit * 60 || 0, [quizData]);
@@ -120,17 +122,90 @@ const QuizAttempt = () => {
         }));
     }, []);
 
-    const handleSubmit = useCallback(() => {
-        Modal.confirm({
-            title: 'Submit Quiz',
-            content: 'Are you sure you want to submit your answers?',
-            onOk: () => {
-                // TODO: Implement submit logic
-                toast.success('Quiz submitted successfully');
-                navigate('/home');
+    const handleSubmit = async () => {
+        try {
+            setIsSubmitting(true);
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('userId');
+
+            if (!token) {
+                message.error('Vui lòng đăng nhập để nộp bài');
+                navigate('/login');
+                return;
             }
-        });
-    }, [navigate]);
+
+            if (!userId) {
+                message.error('Không tìm thấy thông tin người dùng');
+                navigate('/login');
+                return;
+            }
+
+            const submitData = {
+                studentId: parseInt(userId),
+                quizId: parseInt(quizId),
+                answers: Object.entries(answers).map(([questionId, optionId]) => {
+                    const question = questions.find(q => q.QuestionId === parseInt(questionId));
+                    const selectedOption = question.Options.find(opt => opt.OptionId === optionId);
+                    return {
+                        questionId: parseInt(questionId),
+                        answerContent: selectedOption.Content,
+                        createdBy: parseInt(userId)
+                    };
+                })
+            };
+
+            const response = await fetch('https://localhost:7107/api/Result', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(submitData)
+            });
+
+            if (response.status === 401) {
+                message.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại');
+                navigate('/login');
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error('Failed to submit quiz');
+            }
+
+            const result = await response.json();
+            if (result) {
+                message.success('Nộp bài thành công!');
+                navigate(`/quiz/${quizId}/result`, { 
+                    state: { 
+                        result: result,
+                        quiz: quizData
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error submitting quiz:', error);
+            message.error('Có lỗi xảy ra khi nộp bài. Vui lòng thử lại!');
+        } finally {
+            setIsSubmitting(false);
+            setShowSubmitModal(false);
+        }
+    };
+
+    const handleSubmitClick = () => {
+        const unansweredCount = questions.length - Object.keys(answers).length;
+        if (unansweredCount > 0) {
+            Modal.confirm({
+                title: 'Xác nhận nộp bài',
+                content: `Bạn còn ${unansweredCount} câu hỏi chưa trả lời. Bạn có chắc chắn muốn nộp bài?`,
+                okText: 'Nộp bài',
+                cancelText: 'Tiếp tục làm bài',
+                onOk: () => setShowSubmitModal(true)
+            });
+        } else {
+            setShowSubmitModal(true);
+        }
+    };
 
     const handleStarQuestion = useCallback((questionId) => {
         setStarredQuestions(prev => ({
@@ -218,20 +293,20 @@ const QuizAttempt = () => {
                 <Card className="question-card">
                     <div className="question-header">
                         <div className="question-title">
-                            <Title level={4}>Question {currentQuestionIndex + 1}</Title>
+                            <Title level={4}>Câu hỏi {currentQuestionIndex + 1}</Title>
                             <Button
                                 type="text"
                                 icon={starredQuestions[currentQuestion.QuestionId] ? <StarFilled /> : <StarOutlined />}
                                 onClick={() => handleStarQuestion(currentQuestion.QuestionId)}
                                 className={`star-question-button ${starredQuestions[currentQuestion.QuestionId] ? 'starred' : ''}`}
                             >
-                                {starredQuestions[currentQuestion.QuestionId] ? 'Marked' : 'Mark for review'}
+                                {starredQuestions[currentQuestion.QuestionId] ? 'Đã đánh dấu' : 'Đánh dấu để xem lại'}
                             </Button>
                         </div>
                         <Text className="question-content">{currentQuestion.Content}</Text>
                         <div className="question-meta">
-                            <Text type="secondary">Type: {currentQuestion.QuestionType}</Text>
-                            <Text type="secondary">Difficulty: {currentQuestion.Level}</Text>
+                            <Text type="secondary">Loại: {currentQuestion.QuestionType}</Text>
+                            <Text type="secondary">Độ khó: {currentQuestion.Level}</Text>
                         </div>
                     </div>
                     <Radio.Group
@@ -249,25 +324,40 @@ const QuizAttempt = () => {
                     </Radio.Group>
                     <div className="navigation-buttons">
                         <Button
-                            icon={<LeftOutlined />}
+                            icon={<ArrowLeftOutlined />}
                             disabled={currentQuestionIndex === 0}
                             onClick={() => setCurrentQuestionIndex(prev => prev - 1)}
                         >
-                            Previous
-                        </Button>
-                        <Button type="primary" danger onClick={handleSubmit}>
-                            Submit Quiz
+                            Câu trước
                         </Button>
                         <Button
-                            icon={<RightOutlined />}
+                            type="primary"
+                            onClick={handleSubmitClick}
+                            loading={isSubmitting}
+                        >
+                            Nộp bài
+                        </Button>
+                        <Button
+                            icon={<ArrowRightOutlined />}
                             disabled={currentQuestionIndex === questions.length - 1}
                             onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
                         >
-                            Next
+                            Câu tiếp
                         </Button>
                     </div>
                 </Card>
             </Content>
+
+            <Modal
+                title="Xác nhận nộp bài"
+                open={showSubmitModal}
+                onOk={handleSubmit}
+                onCancel={() => setShowSubmitModal(false)}
+                confirmLoading={isSubmitting}
+            >
+                <p>Bạn có chắc chắn muốn nộp bài?</p>
+                <p>Thời gian còn lại: {formatTime(timeLeft)}</p>
+            </Modal>
         </Layout>
     );
 };
