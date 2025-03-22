@@ -186,7 +186,7 @@ const QuizAttempt = () => {
 
             const result = await response.json();
             if (result) {
-                // Clear the saved start time when submitting
+                // Xóa quiz_start_time khỏi localStorage sau khi nộp bài thành công
                 localStorage.removeItem(`quiz_start_time_${quizId}`);
                 message.success('Nộp bài thành công!');
                 navigate(`/quiz/${quizId}/result`, { 
