@@ -59,8 +59,19 @@ const QuizAttempt = () => {
                     return;
                 }
 
-                setTimeLeft(timeLimit);
-                setStartTime(Date.now());
+                // Check if there's a saved start time
+                const savedStartTime = localStorage.getItem(`quiz_start_time_${quizId}`);
+                if (savedStartTime) {
+                    setStartTime(parseInt(savedStartTime));
+                    const elapsed = Math.floor((Date.now() - parseInt(savedStartTime)) / 1000);
+                    const remaining = Math.max(0, timeLimit - elapsed);
+                    setTimeLeft(remaining);
+                } else {
+                    // If no saved time, start new timer
+                    setStartTime(Date.now());
+                    localStorage.setItem(`quiz_start_time_${quizId}`, Date.now().toString());
+                    setTimeLeft(timeLimit);
+                }
 
                 const questionsResponse = await fetch(
                     `${getODataURL('/Question')}?$filter=QuizId eq ${quizId}`, {
@@ -175,6 +186,8 @@ const QuizAttempt = () => {
 
             const result = await response.json();
             if (result) {
+                // Clear the saved start time when submitting
+                localStorage.removeItem(`quiz_start_time_${quizId}`);
                 message.success('Nộp bài thành công!');
                 navigate(`/quiz/${quizId}/result`, { 
                     state: { 
