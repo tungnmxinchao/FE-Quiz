@@ -24,7 +24,8 @@ const QuestionManagement = () => {
         content: '',
         questionType: 'all',
         level: 'all',
-        status: 'all'
+        status: 'all',
+        quizId: 'all'
     });
 
     const fetchQuestions = async () => {
@@ -97,7 +98,8 @@ const QuestionManagement = () => {
             question.Content.toLowerCase().includes(filters.content.toLowerCase()) &&
             (filters.questionType === 'all' || question.QuestionType === filters.questionType) &&
             (filters.level === 'all' || question.Level === filters.level) &&
-            (filters.status === 'all' || question.Status === filters.status)
+            (filters.status === 'all' || question.Status === filters.status) &&
+            (filters.quizId === 'all' || question.QuizId.toString() === filters.quizId)
         );
     });
 
@@ -488,7 +490,7 @@ const QuestionManagement = () => {
                 </Row>
 
                 <Row gutter={16} style={{ marginBottom: 16 }}>
-                    <Col span={6}>
+                    <Col span={4}>
                         <Input
                             placeholder="Search by content"
                             prefix={<SearchOutlined />}
@@ -496,7 +498,7 @@ const QuestionManagement = () => {
                             onChange={(e) => handleFilterChange('content', e.target.value)}
                         />
                     </Col>
-                    <Col span={6}>
+                    <Col span={4}>
                         <Select
                             style={{ width: '100%' }}
                             placeholder="Question Type"
@@ -505,10 +507,9 @@ const QuestionManagement = () => {
                         >
                             <Option value="all">All Types</Option>
                             <Option value="Multiple Choice">Multiple Choice</Option>
-
                         </Select>
                     </Col>
-                    <Col span={6}>
+                    <Col span={4}>
                         <Select
                             style={{ width: '100%' }}
                             placeholder="Level"
@@ -521,7 +522,7 @@ const QuestionManagement = () => {
                             <Option value="Hard">Hard</Option>
                         </Select>
                     </Col>
-                    <Col span={6}>
+                    <Col span={4}>
                         <Select
                             style={{ width: '100%' }}
                             placeholder="Status"
@@ -531,6 +532,21 @@ const QuestionManagement = () => {
                             <Option value="all">All Status</Option>
                             <Option value="active">Active</Option>
                             <Option value="inactive">Inactive</Option>
+                        </Select>
+                    </Col>
+                    <Col span={4}>
+                        <Select
+                            style={{ width: '100%' }}
+                            placeholder="Quiz"
+                            value={filters.quizId}
+                            onChange={(value) => handleFilterChange('quizId', value)}
+                        >
+                            <Option value="all">All Quizzes</Option>
+                            {quizzes.map(quiz => (
+                                <Option key={quiz.QuizId} value={quiz.QuizId.toString()}>
+                                    {quiz.Title}
+                                </Option>
+                            ))}
                         </Select>
                     </Col>
                 </Row>
