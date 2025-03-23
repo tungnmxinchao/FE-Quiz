@@ -52,4 +52,58 @@
 
 .question-management .ant-btn-icon {
     margin-right: 4px;
+}
+
+/* Question Details Modal Styles */
+.question-details {
+    padding: 16px;
+}
+
+.question-details h3 {
+    color: #1f1f1f;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.question-info {
+    margin-bottom: 24px;
+}
+
+.question-info p {
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.question-info strong {
+    color: #666;
+    margin-right: 8px;
+}
+
+.options-list {
+    margin-top: 24px;
+}
+
+.options-list .ant-list-item {
+    padding: 12px;
+    border-radius: 4px;
+    background: #fafafa;
+    margin-bottom: 8px;
+}
+
+.options-list .ant-list-item:hover {
+    background: #f5f5f5;
+}
+
+.options-list .ant-checkbox-wrapper {
+    margin-right: 8px;
+}
+
+.options-list .ant-list-item-meta-title {
+    margin-bottom: 4px;
+}
+
+.options-list .ant-list-item-meta-description {
+    color: #666;
+    font-size: 12px;
 } 

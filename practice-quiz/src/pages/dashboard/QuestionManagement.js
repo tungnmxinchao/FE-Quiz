@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Tag, Modal, Form, Input, Select, message, Popconfirm, Row, Col } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { Table, Button, Space, Tag, Modal, Form, Input, Select, message, Popconfirm, Row, Col, List, Checkbox } from 'antd';
+import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/Layout/MainLayout';
 import { toast } from 'react-toastify';
 import useAuth from '../../hooks/useAuth';
@@ -14,6 +14,8 @@ const QuestionManagement = () => {
     const [quizzes, setQuizzes] = useState([]);
     const [loading, setLoading] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isDetailsModalVisible, setIsDetailsModalVisible] = useState(false);
+    const [selectedQuestion, setSelectedQuestion] = useState(null);
     const [form] = Form.useForm();
     const [editingQuestion, setEditingQuestion] = useState(null);
     const [filters, setFilters] = useState({
@@ -230,6 +232,11 @@ const QuestionManagement = () => {
         }
     };
 
+    const handleViewDetails = (question) => {
+        setSelectedQuestion(question);
+        setIsDetailsModalVisible(true);
+    };
+
     const columns = [
         {
             title: 'ID',
@@ -279,6 +286,13 @@ const QuestionManagement = () => {
             key: 'actions',
             render: (_, record) => (
                 <Space>
+                    <Button
+                        type="primary"
+                        icon={<EyeOutlined />}
+                        onClick={() => handleViewDetails(record)}
+                    >
+                        View Details
+                    </Button>
                     <Button
                         type="primary"
                         icon={<EditOutlined />}
@@ -378,6 +392,45 @@ const QuestionManagement = () => {
                     rowKey="QuestionId"
                     loading={loading}
                 />
+
+                {/* Question Details Modal */}
+                <Modal
+                    title="Question Details"
+                    open={isDetailsModalVisible}
+                    onCancel={() => setIsDetailsModalVisible(false)}
+                    width={800}
+                    footer={null}
+                >
+                    {selectedQuestion && (
+                        <div className="question-details">
+                            <div className="question-info">
+                                <h3>Question Information</h3>
+                                <p><strong>Content:</strong> {selectedQuestion.Content}</p>
+                                <p><strong>Type:</strong> {selectedQuestion.QuestionType}</p>
+                                <p><strong>Level:</strong> {selectedQuestion.Level}</p>
+                                <p><strong>Created By:</strong> {selectedQuestion.CreatedByUser?.FullName}</p>
+                                <p><strong>Created At:</strong> {new Date(selectedQuestion.CreatedAt).toLocaleString()}</p>
+                                <p><strong>Status:</strong> <Tag color={selectedQuestion.Status === 'active' ? 'green' : 'red'}>{selectedQuestion.Status}</Tag></p>
+                            </div>
+                            
+                            <div className="options-list">
+                                <h3>Options</h3>
+                                <List
+                                    dataSource={selectedQuestion.Options}
+                                    renderItem={(option) => (
+                                        <List.Item>
+                                            <List.Item.Meta
+                                                avatar={<Checkbox checked={option.IsCorrect} disabled />}
+                                                title={option.Content}
+                                                description={`Status: ${option.Status}`}
+                                            />
+                                        </List.Item>
+                                    )}
+                                />
+                            </div>
+                        </div>
+                    )}
+                </Modal>
 
                 <Modal
                     title={editingQuestion ? 'Edit Question' : 'Add Question'}
