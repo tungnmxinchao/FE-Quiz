@@ -197,10 +197,11 @@ const QuizManagement = () => {
                         'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
+                        quizId: 0,
                         title: values.Title,
                         description: values.Description,
                         subjectId: parseInt(values.subjectId),
-                        timeLimit: values.TimeLimit,
+                        timeLimit: parseInt(values.TimeLimit),
                         status: values.Status
                     })
                 });
