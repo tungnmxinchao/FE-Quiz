@@ -160,7 +160,7 @@ const ResultManagement = () => {
                     score >= 80 ? 'green' :
                     score >= 50 ? 'orange' : 'red'
                 }>
-                    {score}%
+                    {score}
                 </Tag>
             ),
         },
@@ -280,7 +280,7 @@ const ResultManagement = () => {
                                 <p><strong>Score:</strong> <Tag color={
                                     selectedResult.score >= 80 ? 'green' :
                                     selectedResult.score >= 50 ? 'orange' : 'red'
-                                }>{selectedResult.score}%</Tag></p>
+                                }>{selectedResult.score}</Tag></p>
                                 <p><strong>Start Time:</strong> {new Date(selectedResult.startTime).toLocaleString()}</p>
                                 <p><strong>End Time:</strong> {new Date(selectedResult.endTime).toLocaleString()}</p>
                                 <p><strong>Duration:</strong> {Math.round((new Date(selectedResult.endTime) - new Date(selectedResult.startTime)) / 1000 / 60)} minutes</p>
