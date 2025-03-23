@@ -1,0 +1,34 @@
+.dashboard-container {
+    padding: 24px;
+}
+
+.dashboard-container h1 {
+    margin-bottom: 24px;
+    color: #1890ff;
+    font-size: 28px;
+}
+
+.management-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.management-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.management-card .ant-statistic-title {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.management-card .ant-statistic-content {
+    font-size: 20px;
+}
+
+.management-card .ant-statistic-content-prefix {
+    margin-right: 8px;
+    font-size: 24px;
+} 

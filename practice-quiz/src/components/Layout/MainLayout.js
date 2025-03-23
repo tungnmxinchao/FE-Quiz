@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Button, Space, Menu } from 'antd';
-import { UserOutlined, LogoutOutlined, HomeOutlined, HistoryOutlined } from '@ant-design/icons';
+import { UserOutlined, LogoutOutlined, HomeOutlined, HistoryOutlined, DashboardOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './MainLayout.css';
@@ -12,13 +12,16 @@ const MainLayout = ({ children }) => {
     const location = useLocation();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userFullName, setUserFullName] = useState('');
+    const [userRole, setUserRole] = useState('');
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         const name = localStorage.getItem('userFullName');
+        const role = localStorage.getItem('userRole');
         if (token) {
             setIsLoggedIn(true);
             setUserFullName(name || '');
+            setUserRole(role || '');
         }
     }, []);
 
@@ -26,8 +29,10 @@ const MainLayout = ({ children }) => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
         localStorage.removeItem('userFullName');
+        localStorage.removeItem('userRole');
         setIsLoggedIn(false);
         setUserFullName('');
+        setUserRole('');
         toast.info('👋 Logged out successfully', {
             position: "top-right",
             autoClose: 3000,
@@ -56,7 +61,14 @@ const MainLayout = ({ children }) => {
                 key: '/profile',
                 icon: <UserOutlined />,
                 label: 'My Profile'
-            }
+            },
+            ...(userRole === 'teacher' ? [
+                {
+                    key: '/dashboard',
+                    icon: <DashboardOutlined />,
+                    label: 'Dashboard'
+                }
+            ] : [])
         ] : [])
     ];
 

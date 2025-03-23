@@ -9,6 +9,22 @@ import QuizAttempt from './pages/QuizAttempt';
 import QuizResult from './pages/QuizResult';
 import QuizHistory from './pages/QuizHistory';
 import Profile from './pages/Profile';
+import Dashboard from './pages/Dashboard';
+
+const ProtectedRoute = ({ children, allowedRole }) => {
+    const userRole = localStorage.getItem('userRole');
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
+
+    if (allowedRole && userRole !== allowedRole) {
+        return <Navigate to="/home" replace />;
+    }
+
+    return children;
+};
 
 function App() {
   return (
@@ -33,6 +49,14 @@ function App() {
         <Route path="/quiz/:quizId/result" element={<QuizResult />} />
         <Route path="/history" element={<QuizHistory />} />
         <Route path="/profile" element={<Profile />} />
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute allowedRole="teacher">
+              <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
         <Route path="/" element={<Navigate to="/home" replace />} />
       </Routes>
     </Router>
