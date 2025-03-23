@@ -106,4 +106,45 @@
 .options-list .ant-list-item-meta-description {
     color: #666;
     font-size: 12px;
+}
+
+/* Edit Mode Styles */
+.question-details .ant-form-item {
+    margin-bottom: 16px;
+}
+
+.question-details .ant-input {
+    width: 100%;
+}
+
+.question-details .ant-select {
+    width: 100%;
+}
+
+.question-details .ant-list-item-actions {
+    margin-left: 8px;
+}
+
+.question-details .ant-list-item-actions button {
+    padding: 4px;
+}
+
+.question-details .ant-list-item-actions button:hover {
+    background: #ff4d4f;
+    color: white;
+}
+
+.question-details .ant-modal-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.question-details .ant-modal-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.question-details .ant-modal-title button {
+    margin-left: 8px;
 } 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Tag, Modal, Form, Input, Select, message, Popconfirm, Row, Col, List, Checkbox } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined, EyeOutlined } from '@ant-design/icons';
+import { Table, Button, Space, Tag, Modal, Form, Input, Select, message, Popconfirm, Row, Col, List, Checkbox, Tooltip } from 'antd';
+import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined, EyeOutlined, CloseOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/Layout/MainLayout';
 import { toast } from 'react-toastify';
 import useAuth from '../../hooks/useAuth';
@@ -16,6 +16,7 @@ const QuestionManagement = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isDetailsModalVisible, setIsDetailsModalVisible] = useState(false);
     const [selectedQuestion, setSelectedQuestion] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
     const [form] = Form.useForm();
     const [editingQuestion, setEditingQuestion] = useState(null);
     const [filters, setFilters] = useState({
@@ -234,7 +235,97 @@ const QuestionManagement = () => {
 
     const handleViewDetails = (question) => {
         setSelectedQuestion(question);
+        setIsEditing(false);
         setIsDetailsModalVisible(true);
+    };
+
+    const handleEditDetails = () => {
+        setIsEditing(true);
+        form.setFieldsValue({
+            ...selectedQuestion,
+            quizId: selectedQuestion.QuizId.toString()
+        });
+    };
+
+    const handleSaveDetails = async () => {
+        try {
+            const values = await form.validateFields();
+            const token = localStorage.getItem('token');
+            if (!token) {
+                return;
+            }
+
+            const response = await fetch(`https://localhost:7107/api/Question?questionId=${selectedQuestion.QuestionId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    content: values.Content,
+                    questionType: values.QuestionType,
+                    level: values.Level,
+                    quizId: parseInt(values.quizId),
+                    status: values.Status,
+                    options: values.Options
+                })
+            });
+
+            if (response.status === 401) {
+                toast.error('Session expired. Please login again');
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+                return;
+            }
+
+            if (response.ok) {
+                toast.success('Question updated successfully');
+                setIsEditing(false);
+                fetchQuestions();
+                const updatedQuestion = await response.json();
+                setSelectedQuestion(updatedQuestion);
+            } else {
+                const errorData = await response.json();
+                toast.error(errorData.message || 'Failed to update question');
+            }
+        } catch (error) {
+            console.error('Error saving question:', error);
+            toast.error('Failed to save question');
+        }
+    };
+
+    const handleAddOption = () => {
+        if (selectedQuestion.Options.length >= 4) {
+            toast.error('Maximum 4 options allowed');
+            return;
+        }
+        const newOption = {
+            OptionId: 0,
+            QuestionId: selectedQuestion.QuestionId,
+            Content: '',
+            IsCorrect: false,
+            Status: 'active'
+        };
+        setSelectedQuestion({
+            ...selectedQuestion,
+            Options: [...selectedQuestion.Options, newOption]
+        });
+    };
+
+    const handleRemoveOption = (optionId) => {
+        setSelectedQuestion({
+            ...selectedQuestion,
+            Options: selectedQuestion.Options.filter(opt => opt.OptionId !== optionId)
+        });
+    };
+
+    const handleOptionChange = (optionId, field, value) => {
+        setSelectedQuestion({
+            ...selectedQuestion,
+            Options: selectedQuestion.Options.map(opt => 
+                opt.OptionId === optionId ? { ...opt, [field]: value } : opt
+            )
+        });
     };
 
     const columns = [
@@ -395,9 +486,30 @@ const QuestionManagement = () => {
 
                 {/* Question Details Modal */}
                 <Modal
-                    title="Question Details"
+                    title={
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span>Question Details</span>
+                            {!isEditing ? (
+                                <Button
+                                    type="primary"
+                                    icon={<EditOutlined />}
+                                    onClick={handleEditDetails}
+                                >
+                                    Edit Options
+                                </Button>
+                            ) : (
+                                <Space>
+                                    <Button onClick={() => setIsEditing(false)}>Cancel</Button>
+                                    <Button type="primary" onClick={handleSaveDetails}>Save Options</Button>
+                                </Space>
+                            )}
+                        </div>
+                    }
                     open={isDetailsModalVisible}
-                    onCancel={() => setIsDetailsModalVisible(false)}
+                    onCancel={() => {
+                        setIsDetailsModalVisible(false);
+                        setIsEditing(false);
+                    }}
                     width={800}
                     footer={null}
                 >
@@ -414,14 +526,56 @@ const QuestionManagement = () => {
                             </div>
                             
                             <div className="options-list">
-                                <h3>Options</h3>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                                    <h3>Options</h3>
+                                    {isEditing && (
+                                        <Button
+                                            type="primary"
+                                            icon={<PlusOutlined />}
+                                            onClick={handleAddOption}
+                                            disabled={selectedQuestion.Options.length >= 4}
+                                        >
+                                            Add Option
+                                        </Button>
+                                    )}
+                                </div>
                                 <List
                                     dataSource={selectedQuestion.Options}
                                     renderItem={(option) => (
-                                        <List.Item>
+                                        <List.Item
+                                            actions={isEditing ? [
+                                                <Tooltip title="Remove Option">
+                                                    <Button
+                                                        type="text"
+                                                        danger
+                                                        icon={<CloseOutlined />}
+                                                        onClick={() => handleRemoveOption(option.OptionId)}
+                                                    />
+                                                </Tooltip>
+                                            ] : null}
+                                        >
                                             <List.Item.Meta
-                                                avatar={<Checkbox checked={option.IsCorrect} disabled />}
-                                                title={option.Content}
+                                                avatar={
+                                                    isEditing ? (
+                                                        <Checkbox
+                                                            checked={option.IsCorrect}
+                                                            onChange={(e) => handleOptionChange(option.OptionId, 'IsCorrect', e.target.checked)}
+                                                        />
+                                                    ) : (
+                                                        <Checkbox checked={option.IsCorrect} disabled />
+                                                    )
+                                                }
+                                                title={
+                                                    isEditing ? (
+                                                        <Input
+                                                            value={option.Content}
+                                                            onChange={(e) => handleOptionChange(option.OptionId, 'Content', e.target.value)}
+                                                            placeholder="Enter option content"
+                                                        />
+                                                    ) : (
+                                                        option.Content
+                                                    )
+                                                }
                                                 description={`Status: ${option.Status}`}
                                             />
                                         </List.Item>
