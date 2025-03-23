@@ -19,6 +19,7 @@ const QuestionManagement = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [form] = Form.useForm();
     const [editingQuestion, setEditingQuestion] = useState(null);
+    const [newQuestionOptions, setNewQuestionOptions] = useState([]);
     const [filters, setFilters] = useState({
         content: '',
         questionType: 'all',
@@ -149,6 +150,29 @@ const QuestionManagement = () => {
         }
     };
 
+    const handleAddNewOption = () => {
+        if (newQuestionOptions.length >= 4) {
+            toast.error('Maximum 4 options allowed');
+            return;
+        }
+        const newOption = {
+            content: '',
+            isCorrect: false,
+            status: 'active'
+        };
+        setNewQuestionOptions([...newQuestionOptions, newOption]);
+    };
+
+    const handleRemoveNewOption = (index) => {
+        setNewQuestionOptions(newQuestionOptions.filter((_, i) => i !== index));
+    };
+
+    const handleNewOptionChange = (index, field, value) => {
+        setNewQuestionOptions(newQuestionOptions.map((opt, i) => 
+            i === index ? { ...opt, [field]: value } : opt
+        ));
+    };
+
     const handleModalOk = async () => {
         try {
             const values = await form.validateFields();
@@ -186,6 +210,7 @@ const QuestionManagement = () => {
                     setIsModalVisible(false);
                     form.resetFields();
                     setEditingQuestion(null);
+                    setNewQuestionOptions([]);
                     fetchQuestions();
                 } else {
                     const errorData = await response.json();
@@ -200,12 +225,12 @@ const QuestionManagement = () => {
                         'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
-                        questionId: 0,
+                        quizId: parseInt(values.quizId),
                         content: values.Content,
                         questionType: values.QuestionType,
                         level: values.Level,
-                        quizId: parseInt(values.quizId),
-                        status: values.Status
+                        status: values.Status,
+                        options: newQuestionOptions
                     })
                 });
 
@@ -221,6 +246,7 @@ const QuestionManagement = () => {
                     setIsModalVisible(false);
                     form.resetFields();
                     setEditingQuestion(null);
+                    setNewQuestionOptions([]);
                     fetchQuestions();
                 } else {
                     const errorData = await response.json();
@@ -593,7 +619,9 @@ const QuestionManagement = () => {
                     onCancel={() => {
                         setIsModalVisible(false);
                         form.resetFields();
+                        setNewQuestionOptions([]);
                     }}
+                    width={800}
                 >
                     <Form
                         form={form}
@@ -651,6 +679,55 @@ const QuestionManagement = () => {
                                 <Option value="inactive">Inactive</Option>
                             </Select>
                         </Form.Item>
+
+                        {!editingQuestion && (
+                            <div className="options-section">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                                    <h3>Options</h3>
+                                    <Button
+                                        type="primary"
+                                        icon={<PlusOutlined />}
+                                        onClick={handleAddNewOption}
+                                        disabled={newQuestionOptions.length >= 4}
+                                    >
+                                        Add Option
+                                    </Button>
+                                </div>
+                                <List
+                                    dataSource={newQuestionOptions}
+                                    renderItem={(option, index) => (
+                                        <List.Item
+                                            actions={[
+                                                <Tooltip title="Remove Option">
+                                                    <Button
+                                                        type="text"
+                                                        danger
+                                                        icon={<CloseOutlined />}
+                                                        onClick={() => handleRemoveNewOption(index)}
+                                                    />
+                                                </Tooltip>
+                                            ]}
+                                        >
+                                            <List.Item.Meta
+                                                avatar={
+                                                    <Checkbox
+                                                        checked={option.isCorrect}
+                                                        onChange={(e) => handleNewOptionChange(index, 'isCorrect', e.target.checked)}
+                                                    />
+                                                }
+                                                title={
+                                                    <Input
+                                                        value={option.content}
+                                                        onChange={(e) => handleNewOptionChange(index, 'content', e.target.value)}
+                                                        placeholder="Enter option content"
+                                                    />
+                                                }
+                                            />
+                                        </List.Item>
+                                    )}
+                                />
+                            </div>
+                        )}
                     </Form>
                 </Modal>
             </div>
