@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Input, Select, Pagination, Typography, Space, Button } from 'antd';
 import { BookOutlined, UserOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { getODataURL } from '../config/api.config';
 import MainLayout from '../components/Layout/MainLayout';
 import './Home.css';
@@ -9,6 +10,7 @@ const { Title, Text } = Typography;
 const { Search } = Input;
 
 const Home = () => {
+    const navigate = useNavigate();
     const [subjects, setSubjects] = useState([]);
     const [loading, setLoading] = useState(false);
     const [total, setTotal] = useState(0);
@@ -21,11 +23,11 @@ const Home = () => {
         try {
             setLoading(true);
             const skip = (currentPage - 1) * pageSize;
-            let url = `${getODataURL('/Subject')}?$count=true&$skip=${skip}&$top=${pageSize}`;
+            let url = `${getODataURL('/Subject')}?$count=true&$skip=${skip}&$top=${pageSize}&$filter=Status eq 'Active'`;
 
-            // Add filter if search text exists
+            // Add search filter if search text exists
             if (searchText) {
-                url += `&$filter=contains(SubjectName, '${searchText}')`;
+                url += ` and contains(SubjectName, '${searchText}')`;
             }
 
             // Add sorting
@@ -54,6 +56,10 @@ const Home = () => {
     const handleSortChange = (value) => {
         setSortOrder(value);
         setCurrentPage(1);
+    };
+
+    const handleSubjectClick = (subjectId) => {
+        navigate(`/subject/${subjectId}/quizzes`);
     };
 
     return (
@@ -93,11 +99,7 @@ const Home = () => {
                                 hoverable
                                 loading={loading}
                                 className="subject-card"
-                                actions={[
-                                    <Button type="primary" className="practice-button">
-                                        Start Practice
-                                    </Button>
-                                ]}
+                                onClick={() => handleSubjectClick(subject.SubjectId)}
                             >
                                 <div className="card-icon">
                                     <BookOutlined />
