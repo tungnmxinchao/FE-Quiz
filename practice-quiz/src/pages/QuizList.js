@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Typography, Space, Button, Pagination, Empty, Input } from 'antd';
+import { Card, Row, Col, Typography, Space, Button, Pagination, Empty, Input, Modal, Form } from 'antd';
 import { ClockCircleOutlined, UserOutlined, BookOutlined, SearchOutlined } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -20,6 +20,9 @@ const QuizList = () => {
     const [pageSize, setPageSize] = useState(8);
     const [error, setError] = useState(null);
     const [searchText, setSearchText] = useState('');
+    const [showCodeModal, setShowCodeModal] = useState(false);
+    const [selectedQuiz, setSelectedQuiz] = useState(null);
+    const [form] = Form.useForm();
 
     const handleStartQuiz = (quiz) => {
         const userId = localStorage.getItem('userId');
@@ -28,7 +31,54 @@ const QuizList = () => {
             navigate('/login', { state: { from: `/quiz/${quiz.QuizId}` } });
             return;
         }
-        navigate(`/quiz/${quiz.QuizId}`, { state: { quiz } });
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            toast.warning('Please login to start the quiz');
+            return;
+        }
+
+        setSelectedQuiz(quiz);
+        setShowCodeModal(true);
+    };
+
+    const handleJoinQuiz = async (values) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                toast.warning('Please login to join the quiz');
+                return;
+            }
+
+            const response = await fetch('https://localhost:7107/api/Quiz/join-practice', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    quizId: selectedQuiz.QuizId,
+                    quizCode: values.quizCode
+                })
+            });
+
+            if (response.status === 401) {
+                toast.error('Wrong quiz code!');
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error('Failed to join quiz');
+            }
+
+            toast.success('Successfully joined the quiz!');
+            setShowCodeModal(false);
+            form.resetFields();
+            navigate(`/quiz/${selectedQuiz.QuizId}`, { state: { quiz: selectedQuiz } });
+        } catch (error) {
+            console.error('Error joining quiz:', error);
+            toast.error('Failed to join the quiz. Please try again.');
+        }
     };
 
     const fetchQuizzes = async () => {
@@ -196,6 +246,35 @@ const QuizList = () => {
                         />
                     </div>
                 )}
+
+                <Modal
+                    title="Enter Quiz Code"
+                    open={showCodeModal}
+                    onCancel={() => {
+                        setShowCodeModal(false);
+                        form.resetFields();
+                    }}
+                    footer={null}
+                >
+                    <Form
+                        form={form}
+                        onFinish={handleJoinQuiz}
+                        layout="vertical"
+                    >
+                        <Form.Item
+                            name="quizCode"
+                            label="Quiz Code"
+                            rules={[{ required: true, message: 'Please enter the quiz code' }]}
+                        >
+                            <Input placeholder="Enter the quiz code" />
+                        </Form.Item>
+                        <Form.Item>
+                            <Button type="primary" htmlType="submit" block>
+                                Join Quiz
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </Modal>
             </div>
         </MainLayout>
     );
