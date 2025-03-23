@@ -1,0 +1,228 @@
+.quiz-management-container {
+    padding: 24px;
+    background-color: #f0f2f5;
+    min-height: 100vh;
+}
+
+.header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    background-color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-actions h1 {
+    margin: 0;
+    color: #1a1a1a;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.filters-section {
+    background-color: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.filters-section .ant-input,
+.filters-section .ant-select-selector {
+    border-radius: 6px;
+    border: 1px solid #d9d9d9;
+    transition: all 0.3s;
+}
+
+.filters-section .ant-input:hover,
+.filters-section .ant-select-selector:hover {
+    border-color: #40a9ff;
+}
+
+.filters-section .ant-input:focus,
+.filters-section .ant-select-selector:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.table-wrapper {
+    background-color: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table-wrapper .ant-table {
+    background-color: transparent;
+}
+
+.table-wrapper .ant-table-thead > tr > th {
+    background-color: #fafafa;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.table-wrapper .ant-table-tbody > tr:hover > td {
+    background-color: #f5f5f5;
+}
+
+.table-wrapper .ant-tag {
+    border-radius: 4px;
+    padding: 0 8px;
+    height: 24px;
+    line-height: 22px;
+}
+
+.table-wrapper .ant-tag-success {
+    background-color: #f6ffed;
+    border-color: #b7eb8f;
+    color: #52c41a;
+}
+
+.table-wrapper .ant-tag-error {
+    background-color: #fff2f0;
+    border-color: #ffccc7;
+    color: #ff4d4f;
+}
+
+.table-wrapper .ant-space {
+    gap: 8px !important;
+}
+
+.table-wrapper .ant-btn {
+    border-radius: 6px;
+    height: 32px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.table-wrapper .ant-btn-primary {
+    background-color: #1890ff;
+    border-color: #1890ff;
+}
+
+.table-wrapper .ant-btn-primary:hover {
+    background-color: #40a9ff;
+    border-color: #40a9ff;
+}
+
+.table-wrapper .ant-btn-danger {
+    background-color: #ff4d4f;
+    border-color: #ff4d4f;
+    color: white;
+}
+
+.table-wrapper .ant-btn-danger:hover {
+    background-color: #ff7875;
+    border-color: #ff7875;
+}
+
+.modal-body .ant-form-item {
+    margin-bottom: 24px;
+}
+
+.modal-body .ant-form-item-label > label {
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.modal-body .ant-input,
+.modal-body .ant-select-selector {
+    border-radius: 6px;
+    border: 1px solid #d9d9d9;
+    transition: all 0.3s;
+}
+
+.modal-body .ant-input:hover,
+.modal-body .ant-select-selector:hover {
+    border-color: #40a9ff;
+}
+
+.modal-body .ant-input:focus,
+.modal-body .ant-select-selector:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.modal-body .ant-input-number {
+    width: 100%;
+}
+
+.modal-body .ant-input-number-input {
+    height: 32px;
+    border-radius: 6px;
+}
+
+@media (max-width: 768px) {
+    .header-actions {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+
+    .filters-section .ant-row {
+        margin: 0 !important;
+    }
+
+    .filters-section .ant-col {
+        padding: 8px !important;
+    }
+
+    .table-wrapper {
+        padding: 16px;
+    }
+
+    .table-wrapper .ant-table {
+        overflow-x: auto;
+    }
+
+    .table-wrapper .ant-space {
+        flex-wrap: wrap;
+    }
+
+    .table-wrapper .ant-btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+}
+
+/* Custom scrollbar */
+.table-wrapper ::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-wrapper ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-wrapper ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.table-wrapper ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Animation for table rows */
+.table-wrapper .ant-table-tbody > tr {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+} 

@@ -12,21 +12,8 @@ import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/dashboard/UserManagement';
 import SubjectManagement from './pages/dashboard/SubjectManagement';
-
-const ProtectedRoute = ({ children, allowedRole }) => {
-    const userRole = localStorage.getItem('userRole');
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-        return <Navigate to="/login" replace />;
-    }
-
-    if (allowedRole && userRole !== allowedRole) {
-        return <Navigate to="/home" replace />;
-    }
-
-    return children;
-};
+import QuizManagement from './pages/dashboard/QuizManagement';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -70,8 +57,16 @@ function App() {
         <Route 
           path="/dashboard/subjects" 
           element={
-            <ProtectedRoute allowedRoles={["teacher"]}>
+            <ProtectedRoute allowedRole="teacher">
               <SubjectManagement />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/dashboard/quizzes" 
+          element={
+            <ProtectedRoute allowedRole="teacher">
+              <QuizManagement />
             </ProtectedRoute>
           } 
         />
