@@ -218,6 +218,18 @@ const QuestionManagement = () => {
                     toast.error(errorData.message || 'Failed to update question');
                 }
             } else {
+                // Validate options for new question
+                if (newQuestionOptions.length === 0) {
+                    toast.error('Please add at least one option');
+                    return;
+                }
+
+                const hasCorrectOption = newQuestionOptions.some(option => option.isCorrect);
+                if (!hasCorrectOption) {
+                    toast.error('Please select at least one correct option');
+                    return;
+                }
+
                 // Create new question
                 const response = await fetch('https://localhost:7107/api/Question', {
                     method: 'POST',
