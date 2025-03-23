@@ -71,6 +71,9 @@ const QuizList = () => {
                 throw new Error('Failed to join quiz');
             }
 
+            // Save quiz code to localStorage
+            localStorage.setItem(`quizCode_${selectedQuiz.QuizId}`, values.quizCode);
+
             toast.success('Successfully joined the quiz!');
             setShowCodeModal(false);
             form.resetFields();
