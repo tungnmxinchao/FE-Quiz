@@ -7,6 +7,49 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.quiz-history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.quiz-history-header .ant-typography {
+    margin: 0;
+}
+
+.quiz-history-header .ant-space {
+    background: #f8fafc;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.quiz-history-header .ant-picker {
+    background: white;
+    border: 1px solid #e2e8f0;
+}
+
+.quiz-history-header .ant-picker:hover {
+    border-color: #2563eb;
+}
+
+.quiz-history-header .ant-btn-primary {
+    height: 40px;
+    padding: 0 24px;
+    font-size: 16px;
+    font-weight: 600;
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.quiz-history-header .ant-btn-primary:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
 .quiz-history-container .ant-table {
     background: white;
     border-radius: 12px;
@@ -34,10 +77,87 @@
 .pagination-section {
     margin-top: 32px;
     display: flex;
-    justify-content: flex-end;
-    padding: 16px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
     background: #f8fafc;
     border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.pagination-info {
+    font-size: 16px;
+    color: #64748b;
+}
+
+.pagination-info .ant-typography {
+    font-size: 16px;
+}
+
+.ant-pagination {
+    margin: 0;
+}
+
+.ant-pagination-item {
+    border-radius: 6px;
+    margin: 0 4px;
+    min-width: 32px;
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    list-style: none;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s;
+}
+
+.ant-pagination-item:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+.ant-pagination-item-active {
+    border-color: #2563eb;
+    background-color: #2563eb;
+    color: white;
+}
+
+.ant-pagination-prev,
+.ant-pagination-next {
+    border-radius: 6px;
+    margin: 0 4px;
+    min-width: 32px;
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s;
+}
+
+.ant-pagination-prev:hover,
+.ant-pagination-next:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+.ant-select {
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.ant-select:hover {
+    border-color: #2563eb;
+}
+
+.ant-select-selector {
+    border-radius: 6px !important;
+    height: 32px !important;
+    line-height: 32px !important;
+}
+
+.ant-select-selection-item {
+    line-height: 32px !important;
 }
 
 .empty-state {

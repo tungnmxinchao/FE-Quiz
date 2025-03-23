@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Table, Space, Button, Pagination, Empty, message, Modal, Tag, List } from 'antd';
+import { Card, Typography, Table, Space, Button, Pagination, Empty, message, Modal, Tag, List, DatePicker } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, CloseCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import { getODataURL } from '../config/api.config';
 import MainLayout from '../components/Layout/MainLayout';
 import './QuizHistory.css';
+import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
+const { RangePicker } = DatePicker;
 
 const QuizHistory = () => {
     const navigate = useNavigate();
@@ -20,6 +22,8 @@ const QuizHistory = () => {
     const [selectedResult, setSelectedResult] = useState(null);
     const [questions, setQuestions] = useState([]);
     const [loadingQuestions, setLoadingQuestions] = useState(false);
+    const [dateRange, setDateRange] = useState(null);
+    const [isFiltered, setIsFiltered] = useState(false);
 
     const columns = [
         {
@@ -105,7 +109,19 @@ const QuizHistory = () => {
             }
 
             const skip = (currentPage - 1) * pageSize;
-            const url = `${getODataURL('/Result')}?$count=true&$skip=${skip}&$top=${pageSize}&$filter=StudentId eq ${userId}&$orderby=CreatedAt desc`;
+            let filterQuery = `StudentId eq ${userId}`;
+            
+            // Add date range filter if selected
+            if (dateRange && dateRange[0] && dateRange[1]) {
+                const startDate = dayjs(dateRange[0]).format('YYYY-MM-DD');
+                const endDate = dayjs(dateRange[1]).format('YYYY-MM-DD');
+                filterQuery += ` and CreatedAt ge ${startDate} and CreatedAt le ${endDate}`;
+                setIsFiltered(true);
+            } else {
+                setIsFiltered(false);
+            }
+
+            const url = `${getODataURL('/Result')}?$count=true&$skip=${skip}&$top=${pageSize}&$filter=${filterQuery}&$orderby=CreatedAt desc`;
 
             const response = await fetch(url, {
                 headers: {
@@ -126,7 +142,8 @@ const QuizHistory = () => {
             const data = await response.json();
             if (data && Array.isArray(data.value)) {
                 setResults(data.value);
-                setTotal(data['@odata.count'] || 0);
+                // Use @odata.count if not filtered, otherwise use filtered results length
+                setTotal(isFiltered ? data.value.length : (data['@odata.count'] || 0));
             } else {
                 setResults([]);
                 setTotal(0);
@@ -141,9 +158,15 @@ const QuizHistory = () => {
         }
     };
 
+    const handleDateRangeChange = (dates) => {
+        setDateRange(dates);
+        setCurrentPage(1); // Reset to first page when changing date range
+        setIsFiltered(!!dates); // Set filtered state based on whether dates are selected
+    };
+
     useEffect(() => {
         fetchResults();
-    }, [currentPage, pageSize]);
+    }, [currentPage, pageSize, dateRange]);
 
     const renderQuestionDetails = () => {
         if (!selectedResult || !questions.length) return null;
@@ -189,7 +212,24 @@ const QuizHistory = () => {
     return (
         <MainLayout>
             <div className="quiz-history-container">
-                <Title level={2}>Quiz History</Title>
+                <div className="quiz-history-header">
+                    <Title level={2}>Quiz History</Title>
+                    <Space>
+                        <RangePicker
+                            onChange={handleDateRangeChange}
+                            size="large"
+                            style={{ width: 300 }}
+                        />
+                        <Button 
+                            type="primary" 
+                            icon={<SearchOutlined />}
+                            onClick={() => fetchResults()}
+                            size="large"
+                        >
+                            Search
+                        </Button>
+                    </Space>
+                </div>
                 
                 {loading ? (
                     <Card loading={true} />
@@ -212,6 +252,12 @@ const QuizHistory = () => {
                             loading={loading}
                         />
                         <div className="pagination-section">
+                            <div className="pagination-info">
+                                <Text type="secondary">
+                                    Showing {results.length > 0 ? (currentPage - 1) * pageSize + 1 : 0} to{' '}
+                                    {Math.min(currentPage * pageSize, total)} of {total} results
+                                </Text>
+                            </div>
                             <Pagination
                                 current={currentPage}
                                 pageSize={pageSize}
@@ -221,7 +267,8 @@ const QuizHistory = () => {
                                     setPageSize(size);
                                 }}
                                 showSizeChanger
-                                showTotal={(total) => `Total ${total} results`}
+                                showTotal={(total) => `${total} results`}
+                                pageSizeOptions={['6', '10', '20', '50']}
                             />
                         </div>
                     </>
