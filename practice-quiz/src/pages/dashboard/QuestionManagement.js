@@ -321,13 +321,22 @@ const QuestionManagement = () => {
         }
     };
 
+    const handleOptionChange = (optionId, field, value) => {
+        setSelectedQuestion({
+            ...selectedQuestion,
+            Options: selectedQuestion.Options.map(opt => 
+                opt.OptionId === optionId ? { ...opt, [field]: value } : opt
+            )
+        });
+    };
+
     const handleAddOption = () => {
         if (selectedQuestion.Options.length >= 4) {
             toast.error('Maximum 4 options allowed');
             return;
         }
         const newOption = {
-            OptionId: 0,
+            OptionId: Date.now(), // Generate a unique temporary ID
             QuestionId: selectedQuestion.QuestionId,
             Content: '',
             IsCorrect: false,
@@ -343,15 +352,6 @@ const QuestionManagement = () => {
         setSelectedQuestion({
             ...selectedQuestion,
             Options: selectedQuestion.Options.filter(opt => opt.OptionId !== optionId)
-        });
-    };
-
-    const handleOptionChange = (optionId, field, value) => {
-        setSelectedQuestion({
-            ...selectedQuestion,
-            Options: selectedQuestion.Options.map(opt => 
-                opt.OptionId === optionId ? { ...opt, [field]: value } : opt
-            )
         });
     };
 
