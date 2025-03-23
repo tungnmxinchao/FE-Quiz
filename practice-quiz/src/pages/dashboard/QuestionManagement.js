@@ -116,17 +116,18 @@ const QuestionManagement = () => {
             if (!token) {
                 return;
             }
-            const response = await fetch(`https://localhost:7107/api/Question?questionId=${questionId}`, {
+            const question = questions.find(q => q.QuestionId === questionId);
+            const response = await fetch(`https://localhost:7107/api/Question/${questionId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    content: questions.find(q => q.QuestionId === questionId).Content,
-                    questionType: questions.find(q => q.QuestionId === questionId).QuestionType,
-                    level: questions.find(q => q.QuestionId === questionId).Level,
-                    quizId: questions.find(q => q.QuestionId === questionId).QuizId,
+                    quizId: question.QuizId,
+                    content: question.Content,
+                    questionType: question.QuestionType,
+                    level: question.Level,
                     status: 'inactive'
                 })
             });
@@ -183,17 +184,17 @@ const QuestionManagement = () => {
 
             if (editingQuestion) {
                 // Update existing question
-                const response = await fetch(`https://localhost:7107/api/Question?questionId=${editingQuestion.QuestionId}`, {
+                const response = await fetch(`https://localhost:7107/api/Question/${editingQuestion.QuestionId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
+                        quizId: parseInt(values.quizId),
                         content: values.Content,
                         questionType: values.QuestionType,
                         level: values.Level,
-                        quizId: parseInt(values.quizId),
                         status: values.Status
                     })
                 });
@@ -472,8 +473,7 @@ const QuestionManagement = () => {
                         >
                             <Option value="all">All Types</Option>
                             <Option value="Multiple Choice">Multiple Choice</Option>
-                            <Option value="True/False">True/False</Option>
-                            <Option value="Short Answer">Short Answer</Option>
+
                         </Select>
                     </Col>
                     <Col span={6}>
@@ -641,8 +641,6 @@ const QuestionManagement = () => {
                         >
                             <Select>
                                 <Option value="Multiple Choice">Multiple Choice</Option>
-                                <Option value="True/False">True/False</Option>
-                                <Option value="Short Answer">Short Answer</Option>
                             </Select>
                         </Form.Item>
                         <Form.Item
