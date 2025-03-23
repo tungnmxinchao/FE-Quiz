@@ -312,9 +312,23 @@ const QuestionManagement = () => {
             if (optionsResponse.ok) {
                 toast.success('Options updated successfully');
                 setIsEditing(false);
-                fetchQuestions();
-                const updatedQuestion = await optionsResponse.json();
-                setSelectedQuestion(updatedQuestion);
+                
+                // Fetch updated question data
+                const questionResponse = await fetch(`https://localhost:7107/odata/Question(${selectedQuestion.QuestionId})`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (questionResponse.ok) {
+                    const updatedQuestion = await questionResponse.json();
+                    setSelectedQuestion(updatedQuestion);
+                }
+                
+                // Fetch all questions after a short delay to ensure data is updated
+                setTimeout(() => {
+                    fetchQuestions();
+                }, 500);
             } else {
                 const errorData = await optionsResponse.json();
                 toast.error(errorData.message || 'Failed to update options');
