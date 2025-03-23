@@ -276,48 +276,52 @@ const QuestionManagement = () => {
 
     const handleSaveDetails = async () => {
         try {
-            const values = await form.validateFields();
             const token = localStorage.getItem('token');
-            if (!token) {
+            const userId = localStorage.getItem('userId');
+            if (!token || !userId) {
                 return;
             }
 
-            const response = await fetch(`https://localhost:7107/api/Question?questionId=${selectedQuestion.QuestionId}`, {
+            // Format options for API
+            const formattedOptions = selectedQuestion.Options.map(option => ({
+                optionId: option.isNew ? 0 : option.OptionId, // Set to 0 for new options
+                questionId: selectedQuestion.QuestionId,
+                createdBy: parseInt(userId),
+                content: option.Content,
+                isCorrect: option.IsCorrect,
+                status: option.Status
+            }));
+
+            // Update options
+            const optionsResponse = await fetch('https://localhost:7107/api/Option/update', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({
-                    content: values.Content,
-                    questionType: values.QuestionType,
-                    level: values.Level,
-                    quizId: parseInt(values.quizId),
-                    status: values.Status,
-                    options: values.Options
-                })
+                body: JSON.stringify(formattedOptions)
             });
 
-            if (response.status === 401) {
+            if (optionsResponse.status === 401) {
                 toast.error('Session expired. Please login again');
                 localStorage.removeItem('token');
                 window.location.href = '/login';
                 return;
             }
 
-            if (response.ok) {
-                toast.success('Question updated successfully');
+            if (optionsResponse.ok) {
+                toast.success('Options updated successfully');
                 setIsEditing(false);
                 fetchQuestions();
-                const updatedQuestion = await response.json();
+                const updatedQuestion = await optionsResponse.json();
                 setSelectedQuestion(updatedQuestion);
             } else {
-                const errorData = await response.json();
-                toast.error(errorData.message || 'Failed to update question');
+                const errorData = await optionsResponse.json();
+                toast.error(errorData.message || 'Failed to update options');
             }
         } catch (error) {
-            console.error('Error saving question:', error);
-            toast.error('Failed to save question');
+            console.error('Error saving options:', error);
+            toast.error('Failed to save options');
         }
     };
 
@@ -335,12 +339,14 @@ const QuestionManagement = () => {
             toast.error('Maximum 4 options allowed');
             return;
         }
+        const tempId = Date.now(); // Generate temporary unique ID for state management
         const newOption = {
-            OptionId: Date.now(), // Generate a unique temporary ID
+            OptionId: tempId, // Use temporary ID for state management
             QuestionId: selectedQuestion.QuestionId,
             Content: '',
             IsCorrect: false,
-            Status: 'active'
+            Status: 'active',
+            isNew: true // Flag to identify new options
         };
         setSelectedQuestion({
             ...selectedQuestion,
