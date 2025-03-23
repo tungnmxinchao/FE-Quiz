@@ -11,6 +11,7 @@ import QuizHistory from './pages/QuizHistory';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/dashboard/UserManagement';
+import SubjectManagement from './pages/dashboard/SubjectManagement';
 
 const ProtectedRoute = ({ children, allowedRole }) => {
     const userRole = localStorage.getItem('userRole');
@@ -63,6 +64,14 @@ function App() {
           element={
             <ProtectedRoute allowedRole="teacher">
               <UserManagement />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/dashboard/subjects" 
+          element={
+            <ProtectedRoute allowedRoles={["teacher"]}>
+              <SubjectManagement />
             </ProtectedRoute>
           } 
         />
