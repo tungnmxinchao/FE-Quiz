@@ -114,7 +114,12 @@ const ResultManagement = () => {
         }));
     };
 
-    const filteredResults = results.filter(result => {
+    // Sort results by end time in descending order (newest first)
+    const sortedResults = [...results].sort((a, b) => 
+        new Date(b.endTime) - new Date(a.endTime)
+    );
+
+    const filteredResults = sortedResults.filter(result => {
         return (
             result.student.fullName.toLowerCase().includes(filters.studentName.toLowerCase()) &&
             (filters.quizTitle === 'all' || result.quiz.title === filters.quizTitle) &&
@@ -170,6 +175,8 @@ const ResultManagement = () => {
             dataIndex: 'endTime',
             key: 'endTime',
             render: (text) => new Date(text).toLocaleString(),
+            sorter: (a, b) => new Date(b.endTime) - new Date(a.endTime),
+            defaultSortOrder: 'descend',
         },
         {
             title: 'Actions',
