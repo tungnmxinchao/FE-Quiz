@@ -1,0 +1,55 @@
+.question-management {
+    padding: 24px;
+}
+
+.question-management h2 {
+    margin: 0;
+    color: #1f1f1f;
+}
+
+.question-management .ant-table {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.question-management .ant-table-thead > tr > th {
+    background: #fafafa;
+    font-weight: 600;
+}
+
+.question-management .ant-tag {
+    min-width: 80px;
+    text-align: center;
+}
+
+.question-management .ant-input-search {
+    max-width: 300px;
+}
+
+.question-management .ant-select {
+    width: 100%;
+}
+
+.question-management .ant-modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.question-management .ant-form-item {
+    margin-bottom: 16px;
+}
+
+.question-management .ant-space {
+    gap: 8px !important;
+}
+
+.question-management .ant-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.question-management .ant-btn-icon {
+    margin-right: 4px;
+} 
