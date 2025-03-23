@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Table, Space, Button, Pagination, Empty, message } from 'antd';
+import { Card, Typography, Table, Space, Button, Pagination, Empty, message, Modal, Tag, List } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { getODataURL } from '../config/api.config';
 import MainLayout from '../components/Layout/MainLayout';
 import './QuizHistory.css';
@@ -15,6 +16,10 @@ const QuizHistory = () => {
     const [total, setTotal] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [selectedResult, setSelectedResult] = useState(null);
+    const [questions, setQuestions] = useState([]);
+    const [loadingQuestions, setLoadingQuestions] = useState(false);
 
     const columns = [
         {
@@ -45,18 +50,47 @@ const QuizHistory = () => {
             key: 'actions',
             render: (_, record) => (
                 <Space>
-                    <Button type="primary" onClick={() => navigate(`/quiz/${record.QuizId}/result`, { 
-                        state: { 
-                            result: record,
-                            quiz: record.Quiz
-                        }
-                    })}>
+                    <Button type="primary" onClick={() => handleViewDetails(record)}>
                         View Details
                     </Button>
                 </Space>
             ),
         },
     ];
+
+    const handleViewDetails = async (result) => {
+        setSelectedResult(result);
+        setShowDetailsModal(true);
+        await fetchQuestions(result.QuizId);
+    };
+
+    const fetchQuestions = async (quizId) => {
+        try {
+            setLoadingQuestions(true);
+            const token = localStorage.getItem('token');
+            const url = `${getODataURL('/Question')}?$filter=QuizId eq ${quizId}`;
+
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch questions');
+            }
+
+            const data = await response.json();
+            if (data && Array.isArray(data.value)) {
+                setQuestions(data.value);
+            }
+        } catch (error) {
+            console.error('Error fetching questions:', error);
+            toast.error('Failed to load questions');
+        } finally {
+            setLoadingQuestions(false);
+        }
+    };
 
     const fetchResults = async () => {
         try {
@@ -111,6 +145,47 @@ const QuizHistory = () => {
         fetchResults();
     }, [currentPage, pageSize]);
 
+    const renderQuestionDetails = () => {
+        if (!selectedResult || !questions.length) return null;
+
+        return (
+            <List
+                dataSource={questions}
+                renderItem={(question, index) => {
+                    const answer = selectedResult.Answers[index];
+                    const correctOption = question.Options.find(opt => opt.IsCorrect);
+                    const isCorrect = answer && answer.IsCorrect;
+
+                    return (
+                        <List.Item className="question-detail-item">
+                            <div className="question-detail-content">
+                                <div className="question-header">
+                                    <Text strong>Question {index + 1}</Text>
+                                    <Tag color={isCorrect ? "success" : "error"}>
+                                        {isCorrect ? "Correct" : "Incorrect"}
+                                    </Tag>
+                                </div>
+                                <Text className="question-content">{question.Content}</Text>
+                                <div className="answer-section">
+                                    <div className="your-answer">
+                                        <Text type="secondary">Your Answer: </Text>
+                                        <Text>{answer?.AnswerContent}</Text>
+                                    </div>
+                                    {!isCorrect && correctOption && (
+                                        <div className="correct-answer">
+                                            <Text type="secondary">Correct Answer: </Text>
+                                            <Text>{correctOption.Content}</Text>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </List.Item>
+                    );
+                }}
+            />
+        );
+    };
+
     return (
         <MainLayout>
             <div className="quiz-history-container">
@@ -151,6 +226,27 @@ const QuizHistory = () => {
                         </div>
                     </>
                 )}
+
+                <Modal
+                    title={`Quiz Details - ${selectedResult?.Quiz?.Title}`}
+                    open={showDetailsModal}
+                    onCancel={() => setShowDetailsModal(false)}
+                    width={800}
+                    footer={null}
+                >
+                    <div className="quiz-details-header">
+                        <Space direction="vertical" size="small">
+                            <Text>Score: {selectedResult?.Score}%</Text>
+                            <Text>Start Time: {selectedResult?.StartTime && new Date(selectedResult.StartTime).toLocaleString()}</Text>
+                            <Text>End Time: {selectedResult?.EndTime && new Date(selectedResult.EndTime).toLocaleString()}</Text>
+                        </Space>
+                    </div>
+                    {loadingQuestions ? (
+                        <div className="loading-questions">Loading questions...</div>
+                    ) : (
+                        renderQuestionDetails()
+                    )}
+                </Modal>
             </div>
         </MainLayout>
     );
