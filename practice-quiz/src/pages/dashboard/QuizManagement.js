@@ -166,7 +166,7 @@ const QuizManagement = () => {
                         title: values.Title,
                         description: values.Description,
                         subjectId: parseInt(values.subjectId),
-                        timeLimit: values.TimeLimit,
+                        timeLimit: parseInt(values.TimeLimit),
                         status: values.Status
                     })
                 });
@@ -247,7 +247,7 @@ const QuizManagement = () => {
             render: (_, record) => record.Subject?.SubjectName || 'N/A',
         },
         {
-            title: 'Time Limit (hours)',
+            title: 'Time Limit (minutes)',
             dataIndex: 'TimeLimit',
             key: 'TimeLimit',
         },
@@ -428,7 +428,7 @@ const QuizManagement = () => {
 
                         <Form.Item
                             name="TimeLimit"
-                            label="Time Limit (hours)"
+                            label="Time Limit (minutes)"
                             rules={[{ required: true, message: 'Please input time limit!' }]}
                         >
                             <Input type="number" min={1} />
