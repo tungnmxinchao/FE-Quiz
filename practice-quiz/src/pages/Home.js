@@ -23,11 +23,11 @@ const Home = () => {
         try {
             setLoading(true);
             const skip = (currentPage - 1) * pageSize;
-            let url = `${getODataURL('/Subject')}?$count=true&$skip=${skip}&$top=${pageSize}`;
+            let url = `${getODataURL('/Subject')}?$count=true&$skip=${skip}&$top=${pageSize}&$filter=Status eq 'Active'`;
 
-            // Add filter if search text exists
+            // Add search filter if search text exists
             if (searchText) {
-                url += `&$filter=contains(SubjectName, '${searchText}')`;
+                url += ` and contains(SubjectName, '${searchText}')`;
             }
 
             // Add sorting
