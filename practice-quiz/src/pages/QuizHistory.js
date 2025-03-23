@@ -115,13 +115,13 @@ const QuizHistory = () => {
             if (dateRange && dateRange[0] && dateRange[1]) {
                 const startDate = dayjs(dateRange[0]).format('YYYY-MM-DD');
                 const endDate = dayjs(dateRange[1]).format('YYYY-MM-DD');
-                filterQuery += ` and CreatedAt ge ${startDate} and CreatedAt le ${endDate}`;
+                filterQuery += ` and StartTime ge ${startDate} and StartTime le ${endDate}`;
                 setIsFiltered(true);
             } else {
                 setIsFiltered(false);
             }
 
-            const url = `${getODataURL('/Result')}?$count=true&$skip=${skip}&$top=${pageSize}&$filter=${filterQuery}&$orderby=CreatedAt desc`;
+            const url = `${getODataURL('/Result')}?$count=true&$skip=${skip}&$top=${pageSize}&$filter=${filterQuery}&$orderby=StartTime desc`;
 
             const response = await fetch(url, {
                 headers: {
