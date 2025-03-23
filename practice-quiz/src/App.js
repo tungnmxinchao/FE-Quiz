@@ -8,6 +8,7 @@ import QuizList from './pages/QuizList';
 import QuizAttempt from './pages/QuizAttempt';
 import QuizResult from './pages/QuizResult';
 import QuizHistory from './pages/QuizHistory';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/quiz/:quizId" element={<QuizAttempt />} />
         <Route path="/quiz/:quizId/result" element={<QuizResult />} />
         <Route path="/history" element={<QuizHistory />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/" element={<Navigate to="/home" replace />} />
       </Routes>
     </Router>

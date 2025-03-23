@@ -44,13 +44,20 @@ const MainLayout = ({ children }) => {
         {
             key: '/home',
             icon: <HomeOutlined />,
-            label: 'Home',
+            label: 'Home'
         },
-        ...(isLoggedIn ? [{
-            key: '/history',
-            icon: <HistoryOutlined />,
-            label: 'Quiz History',
-        }] : []),
+        ...(isLoggedIn ? [
+            {
+                key: '/history',
+                icon: <HistoryOutlined />,
+                label: 'Quiz History'
+            },
+            {
+                key: '/profile',
+                icon: <UserOutlined />,
+                label: 'My Profile'
+            }
+        ] : [])
     ];
 
     return (
