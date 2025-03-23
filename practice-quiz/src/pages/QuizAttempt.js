@@ -59,6 +59,14 @@ const QuizAttempt = () => {
                     return;
                 }
 
+                // Check if user has the correct quiz code
+                const savedQuizCode = localStorage.getItem(`quizCode_${quizId}`);
+                if (!savedQuizCode) {
+                    toast.error('You need to enter the quiz code first');
+                    navigate('/home');
+                    return;
+                }
+
                 // Check if there's a saved start time
                 const savedStartTime = localStorage.getItem(`quiz_start_time_${quizId}`);
                 if (savedStartTime) {
@@ -186,8 +194,9 @@ const QuizAttempt = () => {
 
             const result = await response.json();
             if (result) {
-                // Xóa quiz_start_time khỏi localStorage sau khi nộp bài thành công
+                // Xóa quiz_start_time và quiz code khỏi localStorage sau khi nộp bài thành công
                 localStorage.removeItem(`quiz_start_time_${quizId}`);
+                localStorage.removeItem(`quizCode_${quizId}`);
                 message.success('Nộp bài thành công!');
                 navigate(`/quiz/${quizId}/result`, { 
                     state: { 
