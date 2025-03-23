@@ -282,7 +282,16 @@ const ResultManagement = () => {
                             <div className="answers-info">
                                 <h3>Answers</h3>
                                 <Table
-                                    dataSource={selectedResult.answers}
+                                    dataSource={selectedResult.answers.map(answer => {
+                                        // Find the question that contains this answer
+                                        const question = questions.find(q => 
+                                            q.Options.some(opt => opt.Content === answer.answerContent)
+                                        );
+                                        return {
+                                            ...answer,
+                                            questionContent: question ? question.Content : 'Question not found'
+                                        };
+                                    })}
                                     columns={[
                                         {
                                             title: 'Question',
