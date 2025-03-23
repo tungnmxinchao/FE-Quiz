@@ -90,7 +90,7 @@ const QuizList = () => {
             setError(null);
             const skip = (currentPage - 1) * pageSize;
             let url = `${getODataURL('/Quiz')}?$count=true&$skip=${skip}&$top=${pageSize}`;
-            url += `&$filter=SubjectId eq ${subjectId}`;
+            url += `&$filter=SubjectId eq ${subjectId} and Status eq 'active'`;
             
             // Add search filter if search text exists
             if (searchText) {
