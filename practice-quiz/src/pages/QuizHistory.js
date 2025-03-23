@@ -15,7 +15,7 @@ const QuizHistory = () => {
     const [loading, setLoading] = useState(true);
     const [total, setTotal] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(6);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [selectedResult, setSelectedResult] = useState(null);
     const [questions, setQuestions] = useState([]);
@@ -31,7 +31,7 @@ const QuizHistory = () => {
             title: 'Score',
             dataIndex: 'Score',
             key: 'score',
-            render: (score) => `${score}%`,
+            render: (score) => score,
         },
         {
             title: 'Start Time',
@@ -236,7 +236,7 @@ const QuizHistory = () => {
                 >
                     <div className="quiz-details-header">
                         <Space direction="vertical" size="small">
-                            <Text>Score: {selectedResult?.Score}%</Text>
+                            <Text>Score: {selectedResult?.Score}</Text>
                             <Text>Start Time: {selectedResult?.StartTime && new Date(selectedResult.StartTime).toLocaleString()}</Text>
                             <Text>End Time: {selectedResult?.EndTime && new Date(selectedResult.EndTime).toLocaleString()}</Text>
                         </Space>

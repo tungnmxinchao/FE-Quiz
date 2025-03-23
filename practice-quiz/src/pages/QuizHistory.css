@@ -1,55 +1,84 @@
 .quiz-history-container {
-    padding: 24px;
+    padding: 32px;
     max-width: 1200px;
     margin: 0 auto;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .quiz-history-container .ant-table {
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.pagination-section {
-    margin-top: 24px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.empty-state {
-    margin-top: 48px;
-    padding: 48px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    font-size: 16px;
 }
 
 .ant-table-thead > tr > th {
-    background: #fafafa;
-    font-weight: 600;
+    background: #f8fafc;
+    font-weight: 700;
+    font-size: 18px;
+    color: #1a365d;
+    padding: 16px;
+}
+
+.ant-table-tbody > tr > td {
+    padding: 16px;
+    font-size: 16px;
 }
 
 .ant-table-tbody > tr:hover > td {
-    background: #f5f5f5;
+    background: #f1f5f9;
+}
+
+.pagination-section {
+    margin-top: 32px;
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.empty-state {
+    margin-top: 64px;
+    padding: 64px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.empty-state .ant-empty-description {
+    font-size: 18px;
+    color: #64748b;
 }
 
 /* Quiz Details Modal Styles */
 .quiz-details-header {
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.quiz-details-header .ant-typography {
+    font-size: 18px;
+    color: #1a365d;
 }
 
 .question-detail-item {
-    padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    background: #fafafa;
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    background: #f8fafc;
     transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
 }
 
 .question-detail-item:hover {
-    background: #f5f5f5;
+    background: #f1f5f9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .question-detail-content {
@@ -60,55 +89,114 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+.question-header .ant-typography {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a365d;
 }
 
 .question-content {
     display: block;
-    margin-bottom: 16px;
-    font-size: 16px;
+    margin-bottom: 20px;
+    font-size: 18px;
     line-height: 1.6;
+    color: #334155;
 }
 
 .answer-section {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px dashed #e8e8e8;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 2px dashed #e2e8f0;
 }
 
 .your-answer, .correct-answer {
-    margin-top: 8px;
+    margin-top: 12px;
+    font-size: 16px;
+}
+
+.your-answer .ant-typography-secondary {
+    font-weight: 600;
+    color: #64748b;
 }
 
 .correct-answer {
-    color: #52c41a;
+    color: #059669;
+    font-weight: 500;
+}
+
+.correct-answer .ant-typography-secondary {
+    color: #059669;
+    font-weight: 600;
 }
 
 .loading-questions {
     text-align: center;
-    padding: 24px;
-    color: #8c8c8c;
+    padding: 32px;
+    color: #64748b;
+    font-size: 18px;
 }
 
 /* Modal Styles */
 .ant-modal-content {
-    border-radius: 12px;
+    border-radius: 16px;
+    overflow: hidden;
 }
 
 .ant-modal-header {
-    border-radius: 12px 12px 0 0;
-    background: #fafafa;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.ant-modal-body {
+    border-radius: 16px 16px 0 0;
+    background: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
     padding: 24px;
-    max-height: 70vh;
-    overflow-y: auto;
 }
 
 .ant-modal-title {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: 700;
     color: #1a365d;
+}
+
+.ant-modal-body {
+    padding: 32px;
+    max-height: 70vh;
+    overflow-y: auto;
+    background: #ffffff;
+}
+
+/* Button Styles */
+.ant-btn-primary {
+    height: 40px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 0 24px;
+    border-radius: 8px;
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.ant-btn-primary:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+/* Tag Styles */
+.ant-tag {
+    padding: 6px 12px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.ant-tag-success {
+    background: #dcfce7;
+    color: #059669;
+    border-color: #86efac;
+}
+
+.ant-tag-error {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #fca5a5;
 } 
