@@ -14,6 +14,7 @@ import UserManagement from './pages/dashboard/UserManagement';
 import SubjectManagement from './pages/dashboard/SubjectManagement';
 import QuizManagement from './pages/dashboard/QuizManagement';
 import QuestionManagement from './pages/dashboard/QuestionManagement';
+import ResultManagement from './pages/dashboard/ResultManagement';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -76,6 +77,14 @@ function App() {
           element={
             <ProtectedRoute allowedRole="teacher">
               <QuestionManagement />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/dashboard/results" 
+          element={
+            <ProtectedRoute allowedRole="teacher">
+              <ResultManagement />
             </ProtectedRoute>
           } 
         />
