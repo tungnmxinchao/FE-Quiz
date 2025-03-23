@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Button, Space } from 'antd';
-import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { Layout, Button, Space, Menu } from 'antd';
+import { UserOutlined, LogoutOutlined, HomeOutlined, HistoryOutlined } from '@ant-design/icons';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './MainLayout.css';
 
@@ -9,6 +9,7 @@ const { Header, Content, Footer } = Layout;
 
 const MainLayout = ({ children }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userFullName, setUserFullName] = useState('');
 
@@ -39,37 +40,59 @@ const MainLayout = ({ children }) => {
         navigate('/home');
     };
 
+    const menuItems = [
+        {
+            key: '/home',
+            icon: <HomeOutlined />,
+            label: 'Home',
+        },
+        ...(isLoggedIn ? [{
+            key: '/history',
+            icon: <HistoryOutlined />,
+            label: 'Quiz History',
+        }] : []),
+    ];
+
     return (
         <Layout className="layout">
             <Header className="header">
                 <div className="logo">Practice Quiz</div>
-                <Space>
-                    {isLoggedIn ? (
-                        <>
-                            <span className="user-name">Welcome, {userFullName}</span>
-                            <Button 
-                                type="primary" 
-                                icon={<LogoutOutlined />} 
-                                onClick={handleLogout}
-                            >
-                                Logout
-                            </Button>
-                        </>
-                    ) : (
-                        <>
-                            <Button 
-                                type="primary" 
-                                icon={<UserOutlined />} 
-                                onClick={() => navigate('/login')}
-                            >
-                                Login
-                            </Button>
-                            <Button onClick={() => navigate('/register')}>
-                                Register
-                            </Button>
-                        </>
-                    )}
-                </Space>
+                <div className="header-content">
+                    <Menu
+                        mode="horizontal"
+                        selectedKeys={[location.pathname]}
+                        items={menuItems}
+                        onClick={({ key }) => navigate(key)}
+                        className="header-menu"
+                    />
+                    <Space>
+                        {isLoggedIn ? (
+                            <>
+                                <span className="user-name">Welcome, {userFullName}</span>
+                                <Button 
+                                    type="primary" 
+                                    icon={<LogoutOutlined />} 
+                                    onClick={handleLogout}
+                                >
+                                    Logout
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button 
+                                    type="primary" 
+                                    icon={<UserOutlined />} 
+                                    onClick={() => navigate('/login')}
+                                >
+                                    Login
+                                </Button>
+                                <Button onClick={() => navigate('/register')}>
+                                    Register
+                                </Button>
+                            </>
+                        )}
+                    </Space>
+                </div>
             </Header>
             <Content className="content">
                 <div className="content-container">
