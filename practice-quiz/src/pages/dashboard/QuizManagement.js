@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Tag, Modal, Form, Input, Select, message, Popconfirm, Row, Col } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined, KeyOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/Layout/MainLayout';
 import { toast } from 'react-toastify';
 import useAuth from '../../hooks/useAuth';
@@ -22,6 +22,9 @@ const QuizManagement = () => {
         subjectId: 'all',
         status: 'all'
     });
+    const [isCodeModalVisible, setIsCodeModalVisible] = useState(false);
+    const [quizCode, setQuizCode] = useState(null);
+    const [loadingCode, setLoadingCode] = useState(false);
 
     const fetchQuizzes = async () => {
         try {
@@ -230,6 +233,41 @@ const QuizManagement = () => {
         }
     };
 
+    const handleViewCode = async (quizId) => {
+        try {
+            setLoadingCode(true);
+            const token = localStorage.getItem('token');
+            if (!token) {
+                return;
+            }
+            const response = await fetch(`https://localhost:7107/api/Quiz/quiz-code/${quizId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.status === 401) {
+                toast.error('Session expired. Please login again');
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+                return;
+            }
+
+            if (response.ok) {
+                const data = await response.json();
+                setQuizCode(data);
+                setIsCodeModalVisible(true);
+            } else {
+                toast.error('Failed to fetch quiz code');
+            }
+        } catch (error) {
+            console.error('Error fetching quiz code:', error);
+            toast.error('Failed to fetch quiz code');
+        } finally {
+            setLoadingCode(false);
+        }
+    };
+
     const columns = [
         {
             title: 'Title',
@@ -289,6 +327,13 @@ const QuizManagement = () => {
                         onClick={() => handleEdit(record)}
                     >
                         Edit
+                    </Button>
+                    <Button
+                        icon={<KeyOutlined />}
+                        onClick={() => handleViewCode(record.QuizId)}
+                        loading={loadingCode}
+                    >
+                        View Code
                     </Button>
                     <Popconfirm
                         title="Are you sure you want to deactivate this quiz?"
@@ -445,6 +490,33 @@ const QuizManagement = () => {
                             </Select>
                         </Form.Item>
                     </Form>
+                </Modal>
+
+                <Modal
+                    title="Quiz Code"
+                    open={isCodeModalVisible}
+                    onCancel={() => {
+                        setIsCodeModalVisible(false);
+                        setQuizCode(null);
+                    }}
+                    footer={null}
+                >
+                    {quizCode && (
+                        <div style={{ textAlign: 'center', padding: '20px' }}>
+                            <h3>Quiz Code</h3>
+                            <div style={{ 
+                                fontSize: '24px', 
+                                fontWeight: 'bold', 
+                                color: '#1890ff',
+                                padding: '10px',
+                                backgroundColor: '#f0f2f5',
+                                borderRadius: '4px',
+                                marginTop: '10px'
+                            }}>
+                                {quizCode.code}
+                            </div>
+                        </div>
+                    )}
                 </Modal>
             </div>
         </MainLayout>
